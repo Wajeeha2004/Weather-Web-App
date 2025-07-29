@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Weather App</h2>
+    <input id="city" type="text" placeholder="Enter city name">
+    <button id="search" onclick="fetchData()">Search</button>
+    <div id="weather-result">
+      <p id="error-message"></p>
+      <h2 id="city-name"></h2>
+      <img id="weather-icon" class="weather-icon" src="">
+      <p id="temperature"></p>
+      <p id="description"></p>
+      <p id="humidity"></p>
+    </div>
+  </div>
+  <script>
+    const API_KEY = "bd5e378503939ddaee76f12ad7a97608";
+    
+    function fetchData() {
+      const cityName = document.getElementById("city").value.trim();
+      if (cityName) {
+        fetchWeather(cityName);
+      } else {
+        displayError("Please enter a city name.");
+      }
+    }
+
+    function fetchWeather(city) {
+      const apiURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
+
+      fetch(apiURL)
+        .then(response => {
+          if (!response.ok) throw new Error("City not found");
+          return response.json();
+        })
+        .then(data => displayWeather(data))
+        .catch(error => displayError(error.message));
+    }
+
+    function displayWeather(data) {
+      document.getElementById("error-message").textContent = "";
+      document.getElementById("city-name").textContent = `Weather in ${data.name}`;
+      document.getElementById("temperature").textContent = `Temperature: ${data.main.temp}°C`;
+      document.getElementById("description").textContent = `Condition: ${data.weather[0].description}`;
+      document.getElementById("humidity").textContent = `Humidity: ${data.main.humidity}%`;
+      const iconCode = data.weather[0].icon;
+      const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+      document.getElementById("weather-icon").src = iconUrl;
+      document.getElementById("weather-icon").style.display = "block";
+    }
+
+    function displayError(message) {
+      document.getElementById("error-message").textContent = message;
+      document.getElementById("city-name").textContent = "";
+      document.getElementById("temperature").textContent = "";
+      document.getElementById("description").textContent = "";
+      document.getElementById("humidity").textContent = "";
+      document.getElementById("weather-icon").style.display = "none";
+    }
+  </script>
+</body>
+</html>
